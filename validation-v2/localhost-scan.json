@@ -1,0 +1,26 @@
+{
+  "meta": {
+    "version": 2,
+    "target": "localhost",
+    "targets": [
+      "127.0.0.1"
+    ],
+    "resolved": [
+      "127.0.0.1"
+    ],
+    "ports_scanned": 1,
+    "scope": "lab",
+    "started_utc": "2026-10-20T06:30:35+00:00",
+    "elapsed_s": 0.3
+  },
+  "results": [
+    {
+      "target": "127.0.0.1",
+      "port": 8080,
+      "state": "open",
+      "service": "http",
+      "banner": "HTTP/1.0 200 OK",
+      "rtt_ms": 301.9
+    }
+  ]
+}
