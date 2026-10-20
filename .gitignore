@@ -1,0 +1,6 @@
+# Scan outputs (real results stay local, never committed)
+*.csv
+*.json
+!tests/*.py
+__pycache__/
+*.pyc
