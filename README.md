@@ -95,7 +95,7 @@ python3 scripts/portscan.py 127.0.0.0/30 --ports 22,80,8080 --format csv,json,ht
 python3 scripts/portscan.py localhost --ports 1-1024 --html
 ```
 
-### v2 validation (actually run locally)
+### v2 test results
 
 All 34 unit tests (the original 11 + 23 new: CIDR expansion, target-set guard,
 fingerprint rules, HTML output) passing:
@@ -169,12 +169,12 @@ $ python3 scripts/portscan.py 127.0.0.1,8.8.8.8 --ports 53    (exit code 2)
 error: refusing to scan 8.8.8.8: not a loopback/private address. ...
 ```
 
-Honest notes: the `/30` expansion includes network + broadcast addresses
+Notes: the `/30` expansion includes network + broadcast addresses
 (all four were scanned; only 127.0.0.1 had the listener), and the
 "unresolvable host" test uses a malformed label (`no_such_host!.invalid`)
-because the local DNS wildcard-resolves any well-formed hostname.
+because some DNS resolvers answer for any well-formed hostname.
 
-## Validation (actually run locally)
+## Test results
 
 Unit tests — 11/11 passing:
 
