@@ -47,6 +47,6 @@ can be a printer, Jenkins, or a camera, and the banner usually tells you which.
 
 - No UDP scanning, no OS fingerprinting, no version detection beyond banners.
 - Accuracy on high-latency WAN targets depends on `--timeout`; the defaults
-  are tuned for LAN/lab use.
+  are tuned for LAN/private-network use.
 - Service names for well-known ports are *hints* (`SERVICE_HINTS`); the banner
   is the source of truth when present.

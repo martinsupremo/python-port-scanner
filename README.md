@@ -38,7 +38,7 @@ scanner **refuses public targets by default** (see Scope & ethics).
 # Scan localhost (allowed by default — it's yours)
 python3 scripts/portscan.py 127.0.0.1 --ports 1-1024
 
-# Scan your lab network segment
+# Scan your private network segment
 python3 scripts/portscan.py 192.168.1.50 --ports 22,80,443,8080
 
 # Run the tests
@@ -51,8 +51,9 @@ Port scanning third-party systems without permission is illegal in many
 jurisdictions and hostile everywhere. This tool encodes that in code, not
 just docs:
 
-- Default scope `--target-scope lab`: **only** loopback and RFC 1918 private
-  addresses are accepted. Public targets are refused with an error.
+- Default scope is private-only: **only** loopback and RFC 1918 private
+  addresses are accepted (select with `--target-scope`). Public targets are
+  refused with an error.
 - `--target-scope own` unlocks public targets **only** as your explicit
   assertion that you own the host or hold written permission to test it.
 
@@ -73,11 +74,11 @@ fingerprint table — all still standard library only.
   Every address in a small CIDR block is expanded (a hard cap of
   `MAX_TARGETS = 1024` stops a `/8` typo from queueing millions of hosts).
 - **Guard applies to every target.** `disallowed_targets()` checks the *whole*
-  resolved set: one public IP in the mix refuses the entire run in lab scope —
+  resolved set: one public IP in the mix refuses the entire run in the default private-only scope —
   verified by tests at both the function and `main()` level.
 - **HTML report output.** `--format csv,json,html` (or just `--html`) writes a
-  self-contained `<prefix>.html`: inline CSS only, no external assets, a LAB
-  banner, a summary block (targets, ports, scope, timing) and a results table.
+  self-contained `<prefix>.html`: inline CSS only, no external assets, a scope
+  badge, a summary block (targets, ports, scope, timing) and a results table.
 - **Service fingerprinting.** `BANNER_SIGNATURES` is an ordered table of regex
   rules over the banner text (SSH, HTTP, SMTP vs FTP greeting disambiguation,
   MySQL/MariaDB, POP3/IMAP, RDP TPKT header) — the label now comes from what
@@ -88,7 +89,7 @@ fingerprint table — all still standard library only.
   the RDP signature recognizes.
 
 ```bash
-# Scan a lab subnet, writing CSV + JSON + HTML
+# Scan a private subnet, writing CSV + JSON + HTML
 python3 scripts/portscan.py 127.0.0.0/30 --ports 22,80,8080 --format csv,json,html
 
 # Single host with the HTML report on top of the usual outputs
@@ -128,10 +129,10 @@ test_single (test_portscan.TestParsePorts.test_single) ... ok
 test_banner_port (test_portscan.TestScanPort.test_banner_port) ... ok
 test_closed_port_returns_none (test_portscan.TestScanPort.test_closed_port_returns_none) ... ok
 test_silent_server_gets_http_probe (test_portscan.TestScanPort.test_silent_server_gets_http_probe) ... ok
-test_lab_allows_loopback_and_private (test_portscan.TestScope.test_lab_allows_loopback_and_private) ... ok
-test_lab_refuses_public (test_portscan.TestScope.test_lab_refuses_public) ... ok
+test_private_allows_loopback_and_private (test_portscan.TestScope.test_private_allows_loopback_and_private) ... ok
+test_private_refuses_public (test_portscan.TestScope.test_private_refuses_public) ... ok
 test_own_scope_allows_public (test_portscan.TestScope.test_own_scope_allows_public) ... ok
-test_guard_accepts_all_lab (test_portscan.TestTargetSetGuard.test_guard_accepts_all_lab) ... ok
+test_guard_accepts_all_private (test_portscan.TestTargetSetGuard.test_guard_accepts_all_private) ... ok
 test_guard_own_allows_set (test_portscan.TestTargetSetGuard.test_guard_own_allows_set) ... ok
 test_guard_rejects_set_with_any_public (test_portscan.TestTargetSetGuard.test_guard_rejects_set_with_any_public) ... ok
 test_main_cidr_set_refuses_public (test_portscan.TestTargetSetGuard.test_main_cidr_set_refuses_public) ... ok
@@ -157,7 +158,7 @@ $ python3 scripts/portscan.py 127.0.0.0/30 --ports 8080 --format csv,json,html -
 ```
 
 The generated `validation-v2/scan.html` is a single self-contained file —
-`<title>Port scan report — 127.0.0.0/30 (LAB)</title>`, the summary block and
+`<title>Port scan report — 127.0.0.0/30 (private scope)</title>`, the summary block and
 result row both contain the scanned target(s), and `grep` for external
 asset references (`src="http` / `href="http`) found zero matches.
 
@@ -186,8 +187,8 @@ test_single ... ok
 test_banner_port ... ok
 test_closed_port_returns_none ... ok
 test_silent_server_gets_http_probe ... ok
-test_lab_allows_loopback_and_private ... ok
-test_lab_refuses_public ... ok
+test_private_allows_loopback_and_private ... ok
+test_private_refuses_public ... ok
 test_own_scope_allows_public ... ok
 
 Ran 11 tests in 0.309s — OK

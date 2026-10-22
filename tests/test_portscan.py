@@ -51,13 +51,13 @@ class TestParsePorts(unittest.TestCase):
 
 
 class TestScope(unittest.TestCase):
-    def test_lab_allows_loopback_and_private(self):
-        self.assertTrue(portscan.is_scan_allowed("127.0.0.1", "lab"))
-        self.assertTrue(portscan.is_scan_allowed("192.168.1.5", "lab"))
-        self.assertTrue(portscan.is_scan_allowed("10.0.0.9", "lab"))
+    def test_private_allows_loopback_and_private(self):
+        self.assertTrue(portscan.is_scan_allowed("127.0.0.1", "private"))
+        self.assertTrue(portscan.is_scan_allowed("192.168.1.5", "private"))
+        self.assertTrue(portscan.is_scan_allowed("10.0.0.9", "private"))
 
-    def test_lab_refuses_public(self):
-        self.assertFalse(portscan.is_scan_allowed("8.8.8.8", "lab"))
+    def test_private_refuses_public(self):
+        self.assertFalse(portscan.is_scan_allowed("8.8.8.8", "private"))
 
     def test_own_scope_allows_public(self):
         self.assertTrue(portscan.is_scan_allowed("8.8.8.8", "own"))
@@ -146,12 +146,12 @@ class TestExpandTargets(unittest.TestCase):
 
 class TestTargetSetGuard(unittest.TestCase):
     def test_guard_rejects_set_with_any_public(self):
-        bad = portscan.disallowed_targets(["127.0.0.1", "8.8.8.8"], "lab")
+        bad = portscan.disallowed_targets(["127.0.0.1", "8.8.8.8"], "private")
         self.assertEqual(bad, ["8.8.8.8"])
 
-    def test_guard_accepts_all_lab(self):
+    def test_guard_accepts_all_private(self):
         self.assertEqual(
-            portscan.disallowed_targets(["127.0.0.1", "192.168.1.9"], "lab"), []
+            portscan.disallowed_targets(["127.0.0.1", "192.168.1.9"], "private"), []
         )
 
     def test_guard_own_allows_set(self):
@@ -219,7 +219,7 @@ class TestHtmlOutput(unittest.TestCase):
             "service": "http", "banner": "HTTP/1.0 200 OK", "rtt_ms": 1.2,
         }]
         meta = {"target": "127.0.0.0/30", "targets": ["127.0.0.0", "127.0.0.1"],
-                "ports_scanned": 2, "scope": "lab",
+                "ports_scanned": 2, "scope": "private",
                 "started_utc": "2026-10-20T00:00:00+00:00", "elapsed_s": 0.3}
         with tempfile.TemporaryDirectory() as tmp:
             path = os.path.join(tmp, "report.html")
@@ -228,7 +228,7 @@ class TestHtmlOutput(unittest.TestCase):
             with open(path) as fh:
                 content = fh.read()
             self.assertIn("127.0.0.1", content)
-            self.assertIn("LAB", content)
+            self.assertIn("PRIVATE SCOPE", content)
             self.assertIn("<style>", content)
             # Self-contained: no external assets are referenced.
             self.assertNotIn('src="http', content)
@@ -236,7 +236,7 @@ class TestHtmlOutput(unittest.TestCase):
 
     def test_html_handles_no_open_ports(self):
         meta = {"target": "127.0.0.1", "targets": ["127.0.0.1"],
-                "ports_scanned": 1, "scope": "lab",
+                "ports_scanned": 1, "scope": "private",
                 "started_utc": "2026-10-20T00:00:00+00:00", "elapsed_s": 0.1}
         with tempfile.TemporaryDirectory() as tmp:
             path = os.path.join(tmp, "empty.html")

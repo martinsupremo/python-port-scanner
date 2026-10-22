@@ -15,7 +15,7 @@
       "127.0.0.3"
     ],
     "ports_scanned": 1,
-    "scope": "lab",
+    "scope": "private",
     "started_utc": "2026-10-20T06:30:32+00:00",
     "elapsed_s": 0.3
   },
