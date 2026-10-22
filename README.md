@@ -30,7 +30,6 @@ scanner **refuses public targets by default** (see Scope & ethics).
 | `scripts/portscan.py` | The scanner (CLI entry point, ~200 lines, commented) |
 | `tests/test_portscan.py` | 34 unit tests: port parsing, scope rules, banner grabbing vs a live test socket, output formats, CIDR/set-guard, fingerprinting, HTML |
 | `docs/architecture.md` | Design decisions: connect scan vs SYN scan, threading model, banner strategy |
-| `docs/interview-answers.md` | "How did you build this?" — talking points for interviews |
 
 ## Quick start
 
