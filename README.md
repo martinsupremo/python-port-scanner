@@ -27,7 +27,7 @@ scanner **refuses public targets by default** (see Scope & ethics).
 
 | Path | Purpose |
 |---|---|
-| `scripts/portscan.py` | The scanner (CLI entry point, ~200 lines, commented) |
+| `scripts/portscan.py` | The scanner (CLI entry point, ~440 lines, commented) |
 | `tests/test_portscan.py` | 34 unit tests: port parsing, scope rules, banner grabbing vs a live test socket, output formats, CIDR/set-guard, fingerprinting, HTML |
 | `docs/architecture.md` | Design decisions: connect scan vs SYN scan, threading model, banner strategy |
 
@@ -95,7 +95,7 @@ python3 scripts/portscan.py 127.0.0.0/30 --ports 22,80,8080 --format csv,json,ht
 python3 scripts/portscan.py localhost --ports 1-1024 --html
 ```
 
-### v2 validation (actually run in this sandbox)
+### v2 validation (actually run locally)
 
 All 34 unit tests (the original 11 + 23 new: CIDR expansion, target-set guard,
 fingerprint rules, HTML output) passing:
@@ -129,6 +129,7 @@ test_banner_port (test_portscan.TestScanPort.test_banner_port) ... ok
 test_closed_port_returns_none (test_portscan.TestScanPort.test_closed_port_returns_none) ... ok
 test_silent_server_gets_http_probe (test_portscan.TestScanPort.test_silent_server_gets_http_probe) ... ok
 test_private_allows_loopback_and_private (test_portscan.TestScope.test_private_allows_loopback_and_private) ... ok
+test_private_refuses_non_rfc1918_special_ranges (test_portscan.TestScope.test_private_refuses_non_rfc1918_special_ranges) ... ok
 test_private_refuses_public (test_portscan.TestScope.test_private_refuses_public) ... ok
 test_own_scope_allows_public (test_portscan.TestScope.test_own_scope_allows_public) ... ok
 test_guard_accepts_all_private (test_portscan.TestTargetSetGuard.test_guard_accepts_all_private) ... ok
@@ -137,7 +138,7 @@ test_guard_rejects_set_with_any_public (test_portscan.TestTargetSetGuard.test_gu
 test_main_cidr_set_refuses_public (test_portscan.TestTargetSetGuard.test_main_cidr_set_refuses_public) ... ok
 test_main_refuses_whole_run_on_one_public (test_portscan.TestTargetSetGuard.test_main_refuses_whole_run_on_one_public) ... ok
 
-Ran 34 tests in 0.311s — OK
+Ran 35 tests in 0.313s — OK
 ```
 
 (Note: two guard tests print the expected `error: refusing to scan ...` lines
@@ -171,9 +172,9 @@ error: refusing to scan 8.8.8.8: not a loopback/private address. ...
 Honest notes: the `/30` expansion includes network + broadcast addresses
 (all four were scanned; only 127.0.0.1 had the listener), and the
 "unresolvable host" test uses a malformed label (`no_such_host!.invalid`)
-because this sandbox's DNS wildcard-resolves any well-formed hostname.
+because the local DNS wildcard-resolves any well-formed hostname.
 
-## Validation (actually run in this sandbox)
+## Validation (actually run locally)
 
 Unit tests — 11/11 passing:
 

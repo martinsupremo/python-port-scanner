@@ -55,9 +55,17 @@ class TestScope(unittest.TestCase):
         self.assertTrue(portscan.is_scan_allowed("127.0.0.1", "private"))
         self.assertTrue(portscan.is_scan_allowed("192.168.1.5", "private"))
         self.assertTrue(portscan.is_scan_allowed("10.0.0.9", "private"))
+        self.assertTrue(portscan.is_scan_allowed("172.16.5.5", "private"))
 
     def test_private_refuses_public(self):
         self.assertFalse(portscan.is_scan_allowed("8.8.8.8", "private"))
+
+    def test_private_refuses_non_rfc1918_special_ranges(self):
+        # ip.is_private matches these; the explicit allow-list must not.
+        self.assertFalse(portscan.is_scan_allowed("169.254.10.20", "private"))  # link-local
+        self.assertFalse(portscan.is_scan_allowed("192.0.2.1", "private"))     # TEST-NET-1
+        self.assertFalse(portscan.is_scan_allowed("198.18.0.1", "private"))    # benchmarking
+        self.assertFalse(portscan.is_scan_allowed("240.0.0.1", "private"))     # reserved
 
     def test_own_scope_allows_public(self):
         self.assertTrue(portscan.is_scan_allowed("8.8.8.8", "own"))

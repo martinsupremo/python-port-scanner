@@ -109,7 +109,20 @@ def is_scan_allowed(target: str, scope: str) -> bool:
         ip = ipaddress.ip_address(target)
     except ValueError:
         return False  # unresolvable / malformed hosts handled by caller
-    return ip.is_loopback or ip.is_private
+    # Explicit allow-list — deliberately NOT ip.is_private, which also
+    # matches 169.254.0.0/16 (link-local), 192.0.2.0/24 (TEST-NET-1),
+    # 198.18.0.0/15 (benchmarking) and 240.0.0.0/4 (reserved). None of
+    # those should be scanned under the default scope.
+    return any(ip in net for net in _ALLOWED_PRIVATE)
+
+
+# Loopback + the three RFC1918 ranges, and nothing else.
+_ALLOWED_PRIVATE = [
+    ipaddress.ip_network("127.0.0.0/8"),
+    ipaddress.ip_network("10.0.0.0/8"),
+    ipaddress.ip_network("172.16.0.0/12"),
+    ipaddress.ip_network("192.168.0.0/16"),
+]
 
 
 def expand_targets(spec: str) -> list[str]:
